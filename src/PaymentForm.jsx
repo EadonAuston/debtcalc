@@ -97,7 +97,7 @@ class PaymentForm extends React.Component {
 
  
    render() {
-      let button = document.querySelector('.increment-years');
+      // let button = document.querySelector('.increment-years');
     
 
 

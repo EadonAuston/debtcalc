@@ -1,7 +1,7 @@
 
 import './App.css';
 import PaymentForm from './PaymentForm';
-import PaymentHistory from './PaymentHistory';
+
 
 function App() {
   return (

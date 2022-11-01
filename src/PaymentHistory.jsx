@@ -2,10 +2,10 @@ import React from "react";
 
 
 class PaymentHistory extends React.Component {
-   constructor () {
-      super();
+   // constructor () {
+   //    super();
      
-   }
+   // }
 
 
  
