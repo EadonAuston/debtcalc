@@ -30,29 +30,18 @@ class PaymentForm extends React.Component {
      
    
    }
+
+   handleChange = ( {target: { value }}) => {
+      this.setState({ principal: value});
+      console.log(this.state.text);
+   }
    
    handleSubmit = (e) => {
       if (this.state.text3 >= ((this.state.principal * this.state.text2 * 0.01) + .01 * this.state.principal)) {
 
       e.preventDefault();
 
-      } else if (this.state.principal <= 100 && this.state.principal > 0 ) {
-        if (this.state.text3 >= this.state.principal + (this.state.principal * this.state.text2 * 0.01)) {
-         alert("You are debt free!");
-        } else {
-         console.log(Number(this.state.principal) * Number(this.state.text2) * 0.01);
-         console.log("Hello");
-      //   alert(`You must pay at least ${(Number(this.state.principal) * Number(this.state.text2) * 0.01 + (.01 * Number(this.state.principal)) - Number(this.state.principal))}`);
-        console.log(Number(this.state.principal) * Number(this.state.text2) * 0.01);
-         // / (Number(this.state.text2 / 100))) / ((1 / (Number(this.state.text2 / 100))) + 1)) + (Math.round(((Number(this.state.principal) + Number(this.state.text3))
-         // / (Number(this.state.text2 / 100))) / ((1 / (Number(this.state.text2 / 100))) + 1)) * this.state.text2 * 0.01)}`);
-        }
       
-   
-   
-
-   
-   
       
       const newItem = {
           text : `You paid $${this.state.text3} on a loan of 
@@ -76,28 +65,31 @@ class PaymentForm extends React.Component {
           items: [...state.items, newItem],
           text: '',
       
-      }))
+      }));
    
 
-   } else {
+  
       e.preventDefault();
      let button =  document.querySelector('.increment-years');
      button.style.border = "5px solid red";
-   }
+   
      
-  }
-  handleChange = ( {target: { value }}) => {
-   this.setState({ principal: value});
-   console.log(this.state.text);
+  }  else if (this.state.principal <= 100 && this.state.principal > 0 && this.state.text3 >= this.state.principal + (this.state.principal * this.state.text2 * 0.01)) {
+   alert("You are debt free!");
+  } else {
+ 
 
 }
+   }
+   
+
 
    // handle = ( name, {target: { value }}) => this.setState({ name : value});
   
 
  
    render() {
-      // let button = document.querySelector('.increment-years');
+     
     
 
 
@@ -171,6 +163,7 @@ class PaymentForm extends React.Component {
       );
    }
 }
+
 
 
 
