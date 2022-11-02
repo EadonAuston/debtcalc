@@ -140,8 +140,9 @@ class PaymentForm extends React.Component {
             <label htmlFor="principal">Principal: (Total Amt)</label><input className="principal" type="number" onChange={this.handleChange}/>
             <label htmlFor="interestRate">Interest Rate: (% / year) </label><input type="text" onChange={this.handleInterest}/>
             <br />
-            <p className="yrlyRate">This will come out to: {Number(this.state.principal) && Number(this.state.text2) ? rate : 0} every year</p>
-            <p className="monthlyRate">Or {Number(this.state.principal) && Number(this.state.text2) ? Math.round(rate / 12) : 0} every month</p>
+            <p className="yrlyRate">This will come out to: {Number(this.state.principal) && Number(this.state.text2) ? rate : 0} every year
+             or {Number(this.state.principal) && Number(this.state.text2) ? Math.round(rate / 12) : 0} every month on interest.
+            </p>
             <label htmlFor="expenditure">Amount paid off this year</label><input className= "timeFrame" type="number" onChange={this.handleExpenditure}/>
             {/* <label htmlFor="expenditureMonths">Amount paid off this month</label><input className= "timeFrameMonths" type="number" onChange={this.handleMonths}/> */}
             <p className="timeAmount">
