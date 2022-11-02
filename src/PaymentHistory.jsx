@@ -2,10 +2,11 @@ import React from "react";
 
 
 class PaymentHistory extends React.Component {
-   // constructor () {
-   //    super();
+   // eslint-disable-next-line
+   constructor () {
+      super();
      
-   // }
+   }
 
 
  

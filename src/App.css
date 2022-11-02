@@ -1,8 +1,5 @@
 .App {
   text-align: center;
-  width: 90vw;
-  height: 90vw;
-  margin: 0 auto;
 }
 
 .App-logo {
@@ -39,7 +36,7 @@ input {
 
 .flexbox {
   display: flex;
-
+  margin-top: 50px;
 }
 
 .payment-history {
