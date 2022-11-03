@@ -2,14 +2,7 @@ import React from "react";
 
 
 class PaymentHistory extends React.Component {
-  
-   // constructor () {
-   //    super();
-     
-   // }
 
-
- 
    render() {
       const { items } = this.props;
 

@@ -1,6 +1,7 @@
 import React from "react";
 import PaymentHistory from "./PaymentHistory";
 
+
 class PaymentForm extends React.Component {
    constructor() {
       super();
@@ -35,14 +36,13 @@ class PaymentForm extends React.Component {
       this.setState({ principal: value});
       console.log(this.state.text);
    }
-   
-   handleSubmit = (e) => {
-      if (this.state.text3 >= ((this.state.principal * this.state.text2 * 0.01) + .01 * this.state.principal)) {
 
-      e.preventDefault();
+   addItem = () => {
+      
 
       
-      
+      const p = document.querySelector('.years-passed');
+      p.innerHTML = `Years Passed: ${this.years}`;
       const newItem = {
           text : `You paid $${this.state.text3} on a loan of 
           $${Math.round(((Number(this.state.principal) + Number(this.state.text3))
@@ -66,53 +66,76 @@ class PaymentForm extends React.Component {
           text: '',
       
       }));
-   
-
-  
-      e.preventDefault();
-     let button =  document.querySelector('.increment-years');
-     button.style.border = "5px solid red";
-   
-     
-  }  else if (this.state.principal <= 100 && this.state.principal > 0 && this.state.text3 >= this.state.principal + (this.state.principal * this.state.text2 * 0.01)) {
-   alert("You are debt free!");
-  } else {
- 
-
-}
    }
    
+   
+   handleSubmit = (e) => {
+     if (Number(this.state.principal) <= 100 
+     && Number(this.state.principal) > 0 
+     && Number(this.state.text3) >= (Number(this.state.principal) + (Number(this.state.principal) * Number(this.state.text2) * 0.01))) {
+      e.preventDefault();
+      console.log('Part 1 worked');
+      
+      this.addItem();
+        } 
+      else if (Number(this.state.principal) > 100 && Number(this.state.text3) >= ((Number(this.state.principal) * Number(this.state.text2 * 0.01)) + (.01 * Number(this.state.principal)))) {
+      e.preventDefault();
 
+     this.addItem();
+   
 
-   // handle = ( name, {target: { value }}) => this.setState({ name : value});
-  
+   } else if (Number(this.state.text3) >= ((Number(this.state.principal) * Number(this.state.text2 * 0.01)) + (.01 * Number(this.state.principal))) && Number(this.state.principal) > 0) {
+      e.preventDefault();
 
+      // this.years++;
+     this.addItem();
+   } else if (Number(this.state.principal) < 0) {
+      e.preventDefault();
+      alert("All of your debt has been paid off!");
+      this.addItem();
+   }
+   
+   
+   else {
+      e.preventDefault();
+      this.addItem();
+   }
+}
+   
  
    render() {
-     
-    
-
-
+      
       setInterval(() => {
-         if (this.state.text3 >= ((this.state.principal * this.state.text2 * 0.01) + .01 * this.state.principal)) {
-            let button =  document.querySelector('.increment-years');
+         let button =  document.querySelector('.increment-years');
+         if (Number(this.state.text3) >= ((Number(this.state.principal) * Number(this.state.text2 * 0.01)) + .01 * Number(this.state.principal)) && Number(this.state.principal) > 100) {
+         button.style.border = "5px solid aqua";
+      }  else if (Number(this.state.principal) <= 100 && Number(this.state.principal) > 0 && Number(this.state.text3) >= Number(this.state.principal) + (Number(this.state.principal) * Number(this.state.text2) * 0.01)) {
+         button.style.border = "5px solid aqua";
+      } else if (Number(this.state.principal) === 0 && Number(this.state.text3) > 0) {
          button.style.border = "5px solid aqua";
       } else {
-         let button =  document.querySelector('.increment-years');
          button.style.border = "5px solid red";
       }
+      }, 100);
 
-      
-      },100);
+   
+
+
       const incrementYears = () => {
-       if (this.state.principal <= 100 && this.state.principal > 0 ) {
-         if (this.state.text3 >= this.state.principal + (this.state.principal * this.state.text2 * 0.01)) {
-            alert("You are debt free!");
+       if (Number(this.state.principal) <= 100 && Number(this.state.principal) > 0 && Number(this.state.text3) >= Number(this.state.principal) + (Number(this.state.principal) * Number(this.state.text2) * 0.01)) {
            
-          
          
-        } else {console.log("no can do")}
-      } else if (this.state.text3 >= (rate + .01 * this.state.principal)) {
+         this.years++;
+         const p = document.querySelector('.years-passed');
+         p.innerHTML = `Years Passed: ${this.years}`;
+
+         const prin = document.querySelector('.principal');
+         prin.value = `${Math.floor(Number(this.state.principal) - Number(this.state.text3) + (Number(this.state.text2)/100) * (Number(this.state.principal)))}`;
+
+
+         this.setState({ principal : Math.floor((Number(this.state.principal) - Number(this.state.text3) + (Number(this.state.text2)/100) * (Number(this.state.principal)))).toString()});
+   
+      } else if (Number(this.state.text3) >= (Number(rate) + .01 * Number(this.state.principal)) && Number(this.state.principal) > 100) {
    
          this.years++;
          const p = document.querySelector('.years-passed');
@@ -123,9 +146,24 @@ class PaymentForm extends React.Component {
 
 
          this.setState({ principal : Math.floor((Number(this.state.principal) - Number(this.state.text3) + (Number(this.state.text2)/100) * (Number(this.state.principal)))).toString()});
-      } else {
+      } else if (Number(this.state.principal) > 100){
        
          alert(`You must pay at least ${Number(this.state.principal) * Number(this.state.text2) * 0.01 + (.01 * Number(this.state.principal))}`);
+       } else if (Number(this.state.principal) === 0){
+         alert('You have paid off all of your debt!');
+       } else if (Number(this.state.principal) < 0){
+         alert('You are now debt-free! From here on you will gain interest on the money that you have saved.')
+         this.years++;
+         const p = document.querySelector('.years-passed');
+         p.innerHTML = `Years Passed: ${this.years}`;
+
+         const prin = document.querySelector('.principal');
+         prin.value = `${Math.floor(Number(this.state.principal) - Number(this.state.text3) + (Number(this.state.text2)/100) * (Number(this.state.principal)))}`;
+
+
+         this.setState({ principal : Math.floor((Number(this.state.principal) - Number(this.state.text3) + (Number(this.state.text2)/100) * (Number(this.state.principal)))).toString()});
+       } else {
+         alert(`You must pay off the remaining principal and interest combined which is at least ${(Number(this.state.text2)/100) * (Number(this.state.principal)) + Number(this.state.principal)}`)
        }
    }
       
