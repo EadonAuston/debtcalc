@@ -1,209 +1,201 @@
 import React from "react";
 import PaymentHistory from "./PaymentHistory";
 
-
 class PaymentForm extends React.Component {
    constructor() {
       super();
     
       this.state = {
-         items : [], text : "",
-
-      };
-      
-      this.years = 0;
-      
+         items : [],
+         text : "",
+         principal : 0,
+         interest : 0,
+         payment : 0,
+      }; 
    }
+
+
+   // I have tried using the DRY principle with 
+   //handleInputChange = ({ target: { name, value }}) => {
+  // this.setState({ [`${name}`]: value})
+//   } But it does not work
+  
+ handleChangePrincipal = ({ target : { value }}) => {
+   this.setState({ principal : value})
+ }
+
+ handleChangeInterest = ({ target : { value }}) => {
+   this.setState({ interest : value})
+ }
+
+ handleChangePayment = ({ target : { value }}) => {
+   this.setState({ payment : value})
+ }
+
+ submitLoan = () => {
+   const {principal , interest} = this.state;
+   let minPayment = document.querySelector('.minimum-payment');
+   let interestPayment = document.querySelector('.interest-payment');
+   let minimumPrincipal = document.querySelector('.minimum-principal');
+
+   minPayment.innerHTML = (0.01 * principal + interest / 1200 * principal).toFixed(2);
+   interestPayment.innerHTML = (interest / 1200 * principal).toFixed(2);
+   minimumPrincipal.innerHTML = (0.01 * principal).toFixed(2);
+ }
+
+ submitPayment = () => {
+   const {principal , interest } = this.state;
+   let payment = document.querySelector('.payment-amt');
    
-   handleInterest = ( {target: { value }}) => {
-      this.setState({ text2: value});
-   }
-   handleExpenditure = ( {target: { value }}) => {
-      this.setState({ text3: value});
-      this.setState({months : value / 12});
-      
+   let minPayment = document.querySelector('.minimum-payment');
+   console.log(Number(minPayment.innerHTML));
    
+   if (payment.value >= Number(minPayment.innerHTML) && Number(principal) > 100) {
+      console.log(true);
+      this.setState({
+         principal : (this.state.principal - payment.value + (interest / 1200 * this.state.principal)).toFixed(2),
+         interest : parseFloat(interest).toFixed(2),
+         payment : parseFloat(this.state.payment).toFixed(2)
+      }, () => {
+         let principalNode = document.querySelectorAll('input');
+         principalNode[0].value = this.state.principal;
+
+         this.submitLoan();
+         this.calculatePayments();
+         this.totalInterest();
+
+      })
+      this.makePayment();
+   } else if (this.state.principal <= 100 &&
+              this.state.principal >= 0 &&
+              payment.value >= (Number(this.state.principal) + (0.01 * Number(this.state.principal)))) {
+         this.setState({
+            principal : (this.state.principal - payment.value + (interest / 1200 * this.state.principal)).toFixed(2),
+            interest : parseFloat(interest).toFixed(2),
+            payment : parseFloat(this.state.payment).toFixed(2)
+         }, () => {
+            let principal = document.querySelectorAll('input');
+            principal[0].value = this.state.principal;
+
+            this.submitLoan();
+            this.calculatePayments();
+            this.totalInterest();
+        
+         })
+         this.makePayment();
+      } else {
+         let secondButton = document.querySelectorAll('button');
+         secondButton[1].addEventListener('mouseover', function () {
+          secondButton[1].style.boxShadow = '0 5px 20px 5px red';
+         })
+         secondButton[1].addEventListener('mouseout', function () {
+            secondButton[1].style.boxShadow = 'none';
+         })
+      }
    }
 
-   handleMonths = ( {target : {value}}) => {
-      this.setState({months : value});
-      this.setState({text3 : value * 12});
-     
+ calculatePayments = () => {
+   let interestRate = this.state.interest / 1200;
+   let paymentAmt = document.querySelector('.payment-amt');
+   let payment = this.state.principal / paymentAmt.value;
+  
+   let monthlyInterest = payment * interestRate;
+   let calc = 1 - monthlyInterest;
+   let percentInterest = interestRate + 1;
    
-   }
+   let calcLog = Math.log10(calc);
+   let percentInterestLog = Math.log10(percentInterest);
+  
+   let answer = calcLog / percentInterestLog * -1;
+  
+   let payments = document.querySelector('.minimum-payments');
+   payments.innerHTML = answer;
+ }
 
-   handleChange = ( {target: { value }}) => {
-      this.setState({ principal: value});
-      console.log(this.state.text);
-   }
+ totalInterest = () => {
+   let paymentAmt = document.querySelector('.payment-amt');
+   let payments = document.querySelector('.minimum-payments');
 
-   addItem = () => {
-      
+   let interest = paymentAmt.value * payments.innerHTML;
+   let totalInterest = this.state.principal - interest;
 
-      
-      const p = document.querySelector('.years-passed');
-      p.innerHTML = `Years Passed: ${this.years}`;
+   let answer = document.querySelector('.total-interest');
+   answer.innerHTML = totalInterest * -1;
+ }
+
+makePayment = () => {
+      const {principal, interest, payment} = this.state;
       const newItem = {
-          text : `You paid $${this.state.text3} on a loan of 
-          $${Math.round(((Number(this.state.principal) + Number(this.state.text3))
-             / (Number(this.state.text2 / 100))) / ((1 / (Number(this.state.text2 / 100))) + 1))}
-           with an interest rate of ${this.state.text2}% and ended up paying
-           $${Math.round((((Number(this.state.principal) + Number(this.state.text3))
-            / (Number(this.state.text2 / 100))) / ((1 / (Number(this.state.text2 / 100))) + 1)) - 
-            (((((Number(this.state.principal) + Number(this.state.text3))
-            / (Number(this.state.text2 / 100))) / ((1 / (Number(this.state.text2 / 100))) + 1)) +
-            ((Number(this.state.principal) + Number(this.state.text3))
-            / (Number(this.state.text2 / 100))) / ((1 / (Number(this.state.text2 / 100))) + 1) * Number((this.state.text2)) / 100)
-             - Number(this.state.text3)))} on the principal.`,
-          id : Date.now(),
-      } 
+         text : 
+         `You paid $${payment} on a loan of $${principal} 
+         with an interest rate of ${interest}% and actually paid 
+         $${(payment - (interest / 1200 * principal)).toFixed(2)} on the principal`,
 
-     
-      
+         id : Date.now(),
+      } 
 
       this.setState((state) => ({ 
           items: [...state.items, newItem],
           text: '',
-      
       }));
-   }
-   
-   
-   handleSubmit = (e) => {
-     if (Number(this.state.principal) <= 100 
-     && Number(this.state.principal) > 0 
-     && Number(this.state.text3) >= (Number(this.state.principal) + (Number(this.state.principal) * Number(this.state.text2) * 0.01))) {
-      e.preventDefault();
-      console.log('Part 1 worked');
-      
-      this.addItem();
-        } 
-      else if (Number(this.state.principal) > 100 && Number(this.state.text3) >= ((Number(this.state.principal) * Number(this.state.text2 * 0.01)) + (.01 * Number(this.state.principal)))) {
-      e.preventDefault();
-
-     this.addItem();
-   
-
-   } else if (Number(this.state.text3) >= ((Number(this.state.principal) * Number(this.state.text2 * 0.01)) + (.01 * Number(this.state.principal))) && Number(this.state.principal) > 0) {
-      e.preventDefault();
-
-      // this.years++;
-     this.addItem();
-   } else if (Number(this.state.principal) < 0) {
-      e.preventDefault();
-      alert("All of your debt has been paid off!");
-      this.addItem();
-   }
-   
-   
-   else {
-      e.preventDefault();
-      this.addItem();
-   }
 }
-   
  
    render() {
-      
-      setInterval(() => {
-         let button =  document.querySelector('.increment-years');
-         if (Number(this.state.text3) >= ((Number(this.state.principal) * Number(this.state.text2 * 0.01)) + .01 * Number(this.state.principal)) && Number(this.state.principal) > 100) {
-         button.style.border = "5px solid aqua";
-      }  else if (Number(this.state.principal) <= 100 && Number(this.state.principal) > 0 && Number(this.state.text3) >= Number(this.state.principal) + (Number(this.state.principal) * Number(this.state.text2) * 0.01)) {
-         button.style.border = "5px solid aqua";
-      } else if (Number(this.state.principal) === 0 && Number(this.state.text3) > 0) {
-         button.style.border = "5px solid aqua";
-      } else {
-         button.style.border = "5px solid red";
-      }
-      }, 100);
-
-   
-
-
-      const incrementYears = () => {
-       if (Number(this.state.principal) <= 100 && Number(this.state.principal) > 0 && Number(this.state.text3) >= Number(this.state.principal) + (Number(this.state.principal) * Number(this.state.text2) * 0.01)) {
-           
-         
-         this.years++;
-         const p = document.querySelector('.years-passed');
-         p.innerHTML = `Years Passed: ${this.years}`;
-
-         const prin = document.querySelector('.principal');
-         prin.value = `${Math.floor(Number(this.state.principal) - Number(this.state.text3) + (Number(this.state.text2)/100) * (Number(this.state.principal)))}`;
-
-
-         this.setState({ principal : Math.floor((Number(this.state.principal) - Number(this.state.text3) + (Number(this.state.text2)/100) * (Number(this.state.principal)))).toString()});
-   
-      } else if (Number(this.state.text3) >= (Number(rate) + .01 * Number(this.state.principal)) && Number(this.state.principal) > 100) {
-   
-         this.years++;
-         const p = document.querySelector('.years-passed');
-         p.innerHTML = `Years Passed: ${this.years}`;
-
-         const prin = document.querySelector('.principal');
-         prin.value = `${Math.floor(Number(this.state.principal) - Number(this.state.text3) + (Number(this.state.text2)/100) * (Number(this.state.principal)))}`;
-
-
-         this.setState({ principal : Math.floor((Number(this.state.principal) - Number(this.state.text3) + (Number(this.state.text2)/100) * (Number(this.state.principal)))).toString()});
-      } else if (Number(this.state.principal) > 100){
-       
-         alert(`You must pay at least ${Number(this.state.principal) * Number(this.state.text2) * 0.01 + (.01 * Number(this.state.principal))}`);
-       } else if (Number(this.state.principal) === 0){
-         alert('You have paid off all of your debt!');
-       } else if (Number(this.state.principal) < 0){
-         alert('You are now debt-free! From here on you will gain interest on the money that you have saved.')
-         this.years++;
-         const p = document.querySelector('.years-passed');
-         p.innerHTML = `Years Passed: ${this.years}`;
-
-         const prin = document.querySelector('.principal');
-         prin.value = `${Math.floor(Number(this.state.principal) - Number(this.state.text3) + (Number(this.state.text2)/100) * (Number(this.state.principal)))}`;
-
-
-         this.setState({ principal : Math.floor((Number(this.state.principal) - Number(this.state.text3) + (Number(this.state.text2)/100) * (Number(this.state.principal)))).toString()});
-       } else {
-         alert(`You must pay off the remaining principal and interest combined which is at least ${(Number(this.state.text2)/100) * (Number(this.state.principal)) + Number(this.state.principal)}`)
-       }
-   }
-      
-   
-
-      const rate = this.state.principal * this.state.text2 / 100;
-      
-
       return (
-         <div className='flexbox'>
-         <form onSubmit={this.handleSubmit}>
-            <label htmlFor="principal">Principal: (Total Amt)</label><input className="principal" type="number" onChange={this.handleChange}/>
-            <label htmlFor="interestRate">Interest Rate: (% / year) </label><input type="text" onChange={this.handleInterest}/>
-            <br />
-            <p className="yrlyRate">This will come out to: {Number(this.state.principal) && Number(this.state.text2) ? rate : 0} every year
-             or {Number(this.state.principal) && Number(this.state.text2) ? Math.round(rate / 12) : 0} every month on interest.
-            </p>
-            <label htmlFor="expenditure">Amount paid off this year</label><input className= "timeFrame" type="number" onChange={this.handleExpenditure}/>
-            {/* <label htmlFor="expenditureMonths">Amount paid off this month</label><input className= "timeFrameMonths" type="number" onChange={this.handleMonths}/> */}
-            <p className="timeAmount">
-               Time until fully paid off at current rate: &nbsp; 
-                {Number(this.state.principal) 
-               && Number(this.state.text2) 
-               && this.state.text3 >= (this.state.principal * (this.state.text2 / 100) + this.state.principal * 0.01) 
-               ? `${this.state.principal / (this.state.principal - (this.state.principal - this.state.text3 + rate))} years more` : 
-               `Please set a payment that is greater than the interest and 1% of the principal combined. This would be at least ${rate + .01 * this.state.principal}`}
-            </p>
-            
-            <button className="increment-years" onClick={incrementYears}>Pay off {this.state.text3} this year</button>
-            <p className="years-passed">Years Passed: {this.years}</p>
-           
-         </form>
-         <PaymentHistory items = {this.state.items}/>
+         <div className='grid'>
+            <div className="box">
+               <div className="title">Enter Amount</div>
+               <div className="flexbox">
+                  <div className="input">Enter Loan Amount</div>
+                     <input type="text" placeholder="ie: 10000" onChange = {this.handleChangePrincipal}/>&nbsp;$
+               </div>
+               <div className="flexbox">
+                  <div className="input">Enter Interest Rate</div>
+                  <input type="text" placeholder="ie: 2.5" onChange = {this.handleChangeInterest}/>&nbsp;%
+               </div>
+               <div className="button">
+                  <button onClick={this.submitLoan}>Submit</button>
+               </div>
+            </div>
+
+            <div className="box center">
+               <div className="title">Payments Remaining</div>
+               <div className="minimum-payments">0</div>
+               <div>Monthly <br /> Payments Left</div>
+               <div>At this rate the total interest remaining is: </div>
+               <div className="total-interest">0</div>
+            </div>
+
+            <div className="box">
+               <div className="title">Make A Payment</div>
+               <div className="flexbox space-between center">
+                  <div>
+               <div className="flexbox">
+                  <div className="input">Interest Payment:</div>$<div className="interest-payment input">0</div>
+               </div>
+               <div className="flexbox">
+                  <div className="input">Minimum Principal:</div>$<div className="minimum-principal input">0</div>
+               </div>
+               </div>
+               <div>
+                  <div className="minimum-payment">0.00</div>
+                  <div>Minimum Monthly Payment</div>
+               </div>
+               </div>
+               <div className="flexbox">
+                  <div className="input">Enter Payment Amount</div>
+                  <input type="text" onChange = {this.handleChangePayment} className = "payment-amt"/>&nbsp;$
+               </div>
+               <div className="button">
+                  <button onClick={this.submitPayment}>Submit Payment</button>
+               </div>
+            </div>
+
+            <PaymentHistory items = {this.state.items}/>
+        
          </div>
-         
       );
    }
 }
-
-
-
 
 export default PaymentForm;
